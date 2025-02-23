@@ -55,7 +55,7 @@ class TheatreHall(models.Model):
         return self.rows * self.seats_in_row
 
     def __str__(self):
-        return f"{self.name} (capacity - {self.capacity})"
+        return self.name
 
 
 class Performance(models.Model):
