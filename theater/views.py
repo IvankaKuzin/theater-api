@@ -1,16 +1,6 @@
-from django.shortcuts import render
-
-from datetime import datetime
-
-from django.db.models import F, Count
-from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from theater.models import (
     Genre,
@@ -19,20 +9,16 @@ from theater.models import (
     TheatreHall,
     Performance,
     Reservation,
-    Ticket,
 )
 from theater.serializers import (
     GenreSerializer,
     ActorSerializer,
     TheatreHallSerializer,
-    PlaySerializer,
-    PerformanceSerializer,
-    ReservationSerializer,
-    TicketSerializer, PlayDetailsSerializer, PlayListSerializer, PlayImageSerializer, PerformanceListSerializer,
-    PerformanceDetailsSerializer, ReservationDetailsSerializer,
-    # TicketListSerializer,
-    # ReservationListSerializer,
-    # ReservationListSerializer,
+    PlaySerializer, PlayDetailsSerializer,
+    PlayListSerializer, PlayImageSerializer,
+    PerformanceSerializer, PerformanceListSerializer,
+    ReservationSerializer, ReservationDetailsSerializer,
+    PerformanceDetailsSerializer,
 )
 
 
