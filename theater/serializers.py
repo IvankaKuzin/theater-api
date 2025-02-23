@@ -79,6 +79,12 @@ class PerformanceDetailsSerializer(PerformanceSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    performance = serializers.SlugRelatedField(many=False, read_only=True, slug_field="play.title")
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "row", "seat", "performance")
+
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
@@ -89,9 +95,9 @@ class TicketSerializer(serializers.ModelSerializer):
         )
         return data
 
-    class Meta:
-        model = Ticket
-        fields = ("id", "row", "seat", "performance")
+
+class TicketDetailsSerializer(TicketSerializer):
+    performance = PerformanceDetailsSerializer(many=False, read_only=True)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -108,3 +114,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             for ticket_data in tickets_data:
                 Ticket.objects.create(reservation=reservation,**ticket_data)
             return reservation
+
+
+class ReservationDetailsSerializer(ReservationSerializer):
+    tickets = TicketDetailsSerializer(many=True, read_only=True)

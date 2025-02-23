@@ -29,7 +29,7 @@ from theater.serializers import (
     PerformanceSerializer,
     ReservationSerializer,
     TicketSerializer, PlayDetailsSerializer, PlayListSerializer, PlayImageSerializer, PerformanceListSerializer,
-    PerformanceDetailsSerializer,
+    PerformanceDetailsSerializer, ReservationDetailsSerializer,
     # TicketListSerializer,
     # ReservationListSerializer,
     # ReservationListSerializer,
@@ -98,10 +98,15 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return ReservationDetailsSerializer
+
+        return ReservationSerializer
