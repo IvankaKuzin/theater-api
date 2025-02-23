@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from user.models import User
 from django.db import models
 
+
 class Actor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -15,9 +16,15 @@ class Actor(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    def __str__(self):
+        return self.full_name
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 def movie_image_file_path(instance, filename):
@@ -34,6 +41,9 @@ class Play(models.Model):
     genres = models.ManyToManyField(Genre, related_name="plays")
     actors = models.ManyToManyField(Actor, related_name="plays")
 
+    def __str__(self):
+        return self.title
+
 
 class TheatreHall(models.Model):
     name = models.CharField(max_length=50)
@@ -44,16 +54,25 @@ class TheatreHall(models.Model):
     def capacity(self):
         return self.rows * self.seats_in_row
 
+    def __str__(self):
+        return f"{self.name} (capacity - {self.capacity})"
+
 
 class Performance(models.Model):
     play = models.ForeignKey(Play, on_delete=models.CASCADE, related_name="performances")
     theatre_hall = models.ForeignKey(TheatreHall, on_delete=models.CASCADE, related_name="performances")
     show_time = models.DateTimeField()
 
+    def __str__(self):
+        return f"{self.play.title} ({self.theatre_hall})"
+
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reservations")
+
+    def __str__(self):
+        return self.user.username
 
 
 class Ticket(models.Model):
