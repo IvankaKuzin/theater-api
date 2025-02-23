@@ -33,7 +33,7 @@ class ActorViewSet(viewsets.ModelViewSet):
 
 
 class PlayViewSet(viewsets.ModelViewSet):
-    queryset = Play.objects.all()
+    queryset = Play.objects.prefetch_related("genres", "actors")
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -70,7 +70,7 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
-    queryset = Performance.objects.all()
+    queryset = Performance.objects.select_related("play", "theatre_hall")
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -83,7 +83,9 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.all()
+    queryset = (Reservation.objects
+                .select_related("user",)
+                .prefetch_related("tickets__performance", "tickets__performance__play"))
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
