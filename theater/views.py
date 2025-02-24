@@ -1,10 +1,7 @@
-from django.db.models import Q
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status, permissions, filters
+from django.db.models import Prefetch, F
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
-from rest_framework.filters import BaseFilterBackend
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from theater.models import (
@@ -13,9 +10,9 @@ from theater.models import (
     Play,
     TheatreHall,
     Performance,
-    Reservation,
+    Reservation, Ticket,
 )
-from theater.permissions import IsAdminOrIfAuthenticatedReadOnly, IsAdminOrReadOnly
+from theater.permissions import IsAdminOrReadOnly
 from theater.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -143,20 +140,24 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = (Reservation.objects
-                .select_related("user",)
-                .prefetch_related("tickets__performance", "tickets__performance__play"))
+    queryset = Reservation.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return (self.queryset
+                .filter(user=self.request.user)
+                .select_related("user",)
+                .prefetch_related("tickets__performance", "tickets__performance__play"))
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
+        print(f"self.action: {self.action}")
         if self.action == "list":
-            return ReservationListSerializer
-        if self.action == "retrieve":
-            return ReservationDetailsSerializer
-
-        return ReservationSerializer
+            serializer = ReservationListSerializer
+        elif self.action == "retrieve":
+            serializer = ReservationDetailsSerializer
+        else:
+            serializer = ReservationSerializer
+        print(f"get_serializer_class() returns: {type(serializer)}")  # Check the type here!
+        return serializer
