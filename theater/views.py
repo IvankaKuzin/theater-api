@@ -1,5 +1,8 @@
-from rest_framework import viewsets, status, permissions
+from django.db.models import Q
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, status, permissions, filters
 from rest_framework.decorators import action
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -21,13 +24,16 @@ from theater.serializers import (
     PlayListSerializer, PlayImageSerializer,
     PerformanceSerializer, PerformanceListSerializer,
     ReservationSerializer, ReservationDetailsSerializer,
-    PerformanceDetailsSerializer,
+    PerformanceDetailsSerializer, ReservationListSerializer,
 )
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
 
 
 class ActorPagination(PageNumberPagination):
@@ -39,6 +45,9 @@ class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
     pagination_class = ActorPagination
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["first_name", "last_name"]
+    ordering_fields = ["first_name", "last_name"]
 
 
 class PlayPagination(PageNumberPagination):
@@ -50,6 +59,9 @@ class PlayViewSet(viewsets.ModelViewSet):
     queryset = Play.objects.prefetch_related("genres", "actors")
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PlayPagination
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["title", "genres__name"]
+    ordering_fields = ["title"]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -103,6 +115,9 @@ class PlayViewSet(viewsets.ModelViewSet):
 class TheatreHallViewSet(viewsets.ModelViewSet):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
 
 
 class PerformancePagination(PageNumberPagination):
@@ -113,6 +128,9 @@ class PerformancePagination(PageNumberPagination):
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.select_related("play", "theatre_hall")
     pagination_class = PerformancePagination
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["show_time", "play__title", "theatre_hall__name"]
+    ordering_fields = ["show_time"]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -136,6 +154,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return ReservationListSerializer
         if self.action == "retrieve":
             return ReservationDetailsSerializer
 
