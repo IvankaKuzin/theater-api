@@ -27,17 +27,17 @@ class Genre(models.Model):
         return self.name
 
 
-def movie_image_file_path(instance, filename):
+def play_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
 
-    return os.path.join("uploads/movies/", filename)
+    return os.path.join("uploads/plays/", filename)
 
 
 class Play(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    image = models.ImageField(null=True, upload_to=movie_image_file_path)
+    image = models.ImageField(null=True, upload_to=play_image_file_path)
     genres = models.ManyToManyField(Genre, related_name="plays")
     actors = models.ManyToManyField(Actor, related_name="plays")
 
@@ -72,7 +72,7 @@ class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reservations")
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.email} create at {self.created_at}"
 
 
 class Ticket(models.Model):

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -29,14 +30,26 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
 
 
+class ActorPagination(PageNumberPagination):
+    page_size = 5
+    max_page_size = 100
+
+
 class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    pagination_class = ActorPagination
+
+
+class PlayPagination(PageNumberPagination):
+    page_size = 4
+    max_page_size = 100
 
 
 class PlayViewSet(viewsets.ModelViewSet):
     queryset = Play.objects.prefetch_related("genres", "actors")
     permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PlayPagination
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -76,14 +89,14 @@ class PlayViewSet(viewsets.ModelViewSet):
     #             required=False,
     #         ),
     #         OpenApiParameter(
-    #             "movies",
+    #             "plays",
     #             type={"type": "array", "items": {"type": "number"}},
     #             description="Filter by movie's id (ex. ?movie=2,3)"
     #         )
     #     ]
     # )
     # def list(self, request, *args, **kwargs):
-    #     """Get list of movies sessions"""
+    #     """Get list of plays sessions"""
     #     return super().list(request, *args, **kwargs)
 
 
@@ -92,8 +105,14 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
     serializer_class = TheatreHallSerializer
 
 
+class PerformancePagination(PageNumberPagination):
+    page_size = 4
+    max_page_size = 100
+
+
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.select_related("play", "theatre_hall")
+    pagination_class = PerformancePagination
 
     def get_serializer_class(self):
         if self.action == "list":
