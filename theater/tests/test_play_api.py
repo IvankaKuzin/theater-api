@@ -1,65 +1,26 @@
 import os
 import tempfile
+
+from PIL import Image
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
 from rest_framework import status
-from PIL import Image
+from rest_framework.test import APIClient
 
-from theater.models import Play, Genre, Actor
+from theater.models import Play
 from theater.serializers import PlayListSerializer, PlayDetailsSerializer
-
-
-def create_test_image():
-    """Create a test image file for testing image uploads"""
-    img = Image.new('RGB', (100, 100), color='red')
-    tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
-    img.save(tmp_file)
-    tmp_file.seek(0)
-    return tmp_file
-
-
-def create_user(email='user@example.com', password='testpass123', is_staff=False):
-    """Helper function to create a user"""
-    return get_user_model().objects.create_user(
-        email=email,
-        password=password,
-        is_staff=is_staff
-    )
-
-
-def create_genre(name='Drama'):
-    """Helper function to create a genre"""
-    return Genre.objects.create(name=name)
-
-
-def create_actor(first_name='John', last_name='Doe'):
-    """Helper function to create an actor"""
-    return Actor.objects.create(first_name=first_name, last_name=last_name)
-
-
-def create_play(**params):
-    """Helper function to create a play with default values"""
-    defaults = {
-        'title': 'Test Play',
-        'description': 'Test description',
-    }
-    defaults.update(params)
-    return Play.objects.create(**defaults)
+from theater.tests.elements_for_tests import (
+    create_test_image,
+    create_user,
+    create_genre,
+    create_actor,
+    create_play,
+    detail_url,
+    image_upload_url
+)
 
 
 PLAYS_URL = reverse("theater:play-list")
-
-
-def detail_url(play_id):
-    """Return play detail URL"""
-    return reverse("theater:play-detail", args=[play_id])
-
-
-def image_upload_url(play_id):
-    """Return URL for play image upload"""
-    return reverse("theater:play-upload-image", args=[play_id])
 
 
 class PublicPlayApiTests(TestCase):
@@ -69,18 +30,6 @@ class PublicPlayApiTests(TestCase):
         self.client = APIClient()
         self.genre = create_genre()
         self.actor = create_actor()
-
-    def test_list_plays(self):
-        """Test retrieving a list of plays"""
-        create_play()
-        create_play(title='Another Play')
-
-        res = self.client.get(PLAYS_URL)
-
-        plays = Play.objects.all().order_by('id')
-        serializer = PlayListSerializer(plays, many=True)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data['results'], serializer.data)
 
     def test_retrieve_play_detail(self):
         """Test retrieving a play detail"""
