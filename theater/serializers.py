@@ -68,38 +68,50 @@ class PerformanceSerializer(serializers.ModelSerializer):
         fields = ("id", "show_time", "theatre_hall", "play")
 
 
-class PerformanceListSerializer(PerformanceSerializer):
+class TicketsFeatureListSerializer(PerformanceSerializer):
     play = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
     theatre_hall = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
-    taken_seats = serializers.SerializerMethodField()
+    taken_seats = serializers.IntegerField(read_only=True)
     tickets_available = serializers.SerializerMethodField()
 
     class Meta:
         model = Performance
         fields = ("id", "show_time", "theatre_hall", "play", "taken_seats", "tickets_available")
 
-    def get_taken_seats(self, obj):
-        return Ticket.objects.filter(performance=obj).count()
+    def get_tickets_available(self, obj):
+        return obj.theatre_hall.capacity - obj.taken_seats
+
+
+class TicketsFeatureDetailsSerializer(PerformanceSerializer):
+    play = PlayDetailsSerializer(many=False, read_only=True)
+    theatre_hall = TheatreHallSerializer(many=False, read_only=True)
+    taken_seats = serializers.IntegerField(read_only=True)
+    tickets_available = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Performance
+        fields = ("id", "show_time", "theatre_hall", "play", "taken_seats", "tickets_available")
 
     def get_tickets_available(self, obj):
-        return obj.theatre_hall.capacity - self.get_taken_seats(obj)
+        return obj.theatre_hall.capacity - obj.taken_seats
+
+
+class PerformanceListSerializer(PerformanceSerializer):
+    play = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
+    theatre_hall = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+
+    class Meta:
+        model = Performance
+        fields = ("id", "show_time", "theatre_hall", "play")
 
 
 class PerformanceDetailsSerializer(PerformanceSerializer):
     play = PlayDetailsSerializer(many=False, read_only=True)
     theatre_hall = TheatreHallSerializer(many=False, read_only=True)
-    taken_seats = serializers.SerializerMethodField()
-    tickets_available = serializers.SerializerMethodField()
 
     class Meta:
         model = Performance
-        fields = ("id", "show_time", "theatre_hall", "play", "taken_seats", "tickets_available")
-
-    def get_taken_seats(self, obj):
-        return Ticket.objects.filter(performance=obj).count()
-
-    def get_tickets_available(self, obj):
-        return obj.theatre_hall.capacity - self.get_taken_seats(obj)
+        fields = ("id", "show_time", "theatre_hall", "play")
 
 
 class TicketSerializer(serializers.ModelSerializer):

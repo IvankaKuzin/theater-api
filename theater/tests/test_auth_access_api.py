@@ -6,12 +6,6 @@ from theater.models import Performance
 from theater.serializers import PlayListSerializer, PerformanceListSerializer
 from theater.tests.elements_for_tests import *
 
-GENRES_URL = reverse("theater:genre-list")
-ACTORS_URL = reverse("theater:actor-list")
-PLAYS_URL = reverse("theater:play-list")
-THEATRE_HALL_URL = reverse("theater:theatrehall-list")
-RESERVATIONS_URL = reverse("theater:reservation-list")
-PERFORMANCE_URL = reverse("theater:performance-list")
 
 class UnauthenticatedUserApiTests(TestCase):
     def setUp(self):

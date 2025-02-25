@@ -1,7 +1,8 @@
+from django.db.models import Prefetch, Count
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from theater.models import (
@@ -21,7 +22,8 @@ from theater.serializers import (
     PlayListSerializer, PlayImageSerializer,
     PerformanceSerializer, PerformanceListSerializer,
     ReservationSerializer, ReservationDetailsSerializer,
-    PerformanceDetailsSerializer, ReservationListSerializer,
+    PerformanceDetailsSerializer, ReservationListSerializer, TicketsFeatureListSerializer,
+    TicketsFeatureDetailsSerializer,
 )
 
 
@@ -130,12 +132,15 @@ class PerformanceViewSet(viewsets.ModelViewSet):
     search_fields = ["show_time", "play__title", "theatre_hall__name"]
     ordering_fields = ["show_time"]
 
+    def get_queryset(self):
+        return self.queryset.annotate(taken_seats=Count("tickets"))
+
     def get_serializer_class(self):
         if self.action == "list":
-            return PerformanceListSerializer
+            return TicketsFeatureListSerializer
 
         if self.action == "retrieve":
-            return PerformanceDetailsSerializer
+            return TicketsFeatureDetailsSerializer
 
         return PerformanceSerializer
 

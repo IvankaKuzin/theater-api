@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from theater.models import Play
-from theater.serializers import PlayListSerializer, PlayDetailsSerializer
+from theater.serializers import PlayDetailsSerializer
 from theater.tests.elements_for_tests import (
     create_test_image,
     create_user,
@@ -18,7 +18,6 @@ from theater.tests.elements_for_tests import (
     detail_url,
     image_upload_url
 )
-
 
 PLAYS_URL = reverse("theater:play-list")
 
