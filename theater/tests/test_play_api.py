@@ -150,7 +150,6 @@ class PrivatePlayApiTests(TestCase):
 
     def test_create_play(self):
         """Test creating a play if admin"""
-        # Create a genre and actor to use in the payload
         genre = create_genre()
         actor = create_actor()
 
@@ -165,11 +164,9 @@ class PrivatePlayApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         play = Play.objects.get(id=res.data['id'])
 
-        # Check basic fields
         self.assertEqual(payload['title'], play.title)
         self.assertEqual(payload['description'], play.description)
 
-        # Check M2M relationships
         self.assertEqual(play.genres.count(), 1)
         self.assertEqual(play.actors.count(), 1)
         self.assertEqual(play.genres.first().id, genre.id)
@@ -245,28 +242,17 @@ class PlayImageUploadTests(TestCase):
     def test_upload_image(self):
         """Test uploading an image to a play"""
         url = image_upload_url(self.play.id)
-        print(f"Upload URL: {url}")
 
-        # Create a test image file
         with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
-            # Create a small image
             img = Image.new('RGB', (10, 10))
             img.save(image_file, format='JPEG')
             image_file.seek(0)
 
-            # Print file info for debugging
-            print(f"File name: {image_file.name}")
-            print(f"File size: {os.path.getsize(image_file.name)}")
-
-            # Upload the image
             res = self.client.post(
                 url,
                 {'image': image_file},
                 format='multipart'
             )
-
-            # Print response content for debugging
-            print(f"Response content: {res.content}")
 
         self.play.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
