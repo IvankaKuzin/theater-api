@@ -1,7 +1,7 @@
-from django.db.models import Prefetch, F
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
 from theater.models import (
@@ -10,7 +10,7 @@ from theater.models import (
     Play,
     TheatreHall,
     Performance,
-    Reservation, Ticket,
+    Reservation,
 )
 from theater.permissions import IsAdminOrReadOnly
 from theater.serializers import (
@@ -67,7 +67,7 @@ class PlayViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return PlayDetailsSerializer
 
-        if self.action == "image-upload":
+        if self.action == "image_upload":
             return PlayImageSerializer
 
         return PlaySerializer
@@ -80,7 +80,7 @@ class PlayViewSet(viewsets.ModelViewSet):
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific movie"""
         play = self.get_object()
-        serializer = self.get_serializer(play, data=request.data)
+        serializer = self.get_serializer(play, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
@@ -125,6 +125,7 @@ class PerformancePagination(PageNumberPagination):
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = Performance.objects.select_related("play", "theatre_hall")
     pagination_class = PerformancePagination
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ["show_time", "play__title", "theatre_hall__name"]
     ordering_fields = ["show_time"]
@@ -141,6 +142,7 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return (self.queryset
@@ -159,5 +161,5 @@ class ReservationViewSet(viewsets.ModelViewSet):
             serializer = ReservationDetailsSerializer
         else:
             serializer = ReservationSerializer
-        print(f"get_serializer_class() returns: {type(serializer)}")  # Check the type here!
+        print(f"get_serializer_class() returns: {type(serializer)}")
         return serializer

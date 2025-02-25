@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "theater.permissions.IsAdminOrIfAuthenticatedReadOnly",
+        "theater.permissions.IsAdminOrReadOnly",
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
