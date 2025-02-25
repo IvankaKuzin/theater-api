@@ -78,7 +78,7 @@ class TicketsFeatureListSerializer(PerformanceSerializer):
         model = Performance
         fields = ("id", "show_time", "theatre_hall", "play", "taken_seats", "tickets_available")
 
-    def get_tickets_available(self, obj):
+    def get_tickets_available(self, obj) -> int:
         return obj.theatre_hall.capacity - obj.taken_seats
 
 
@@ -92,7 +92,7 @@ class TicketsFeatureDetailsSerializer(PerformanceSerializer):
         model = Performance
         fields = ("id", "show_time", "theatre_hall", "play", "taken_seats", "tickets_available")
 
-    def get_tickets_available(self, obj):
+    def get_tickets_available(self, obj) -> int:
         return obj.theatre_hall.capacity - obj.taken_seats
 
 
