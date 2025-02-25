@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from theater.models import Genre, Actor, Play, TheatreHall, Performance, Reservation, Ticket
 
-
 GENRES_URL = reverse("theater:genre-list")
 ACTORS_URL = reverse("theater:actor-list")
 PLAYS_URL = reverse("theater:play-list")
