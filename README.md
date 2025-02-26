@@ -51,23 +51,61 @@ The Theater API provides a complete backend solution for theater management syst
    ```
 
 4. Configure environment variables:
-   - Create a `.env` file based on `.env.example`
+   - Create a `.env` file based on `.env.sample`
    - Set your database credentials and other configuration options
 
-5. Apply migrations:
+If you chose local settings file:
+1. Apply migrations:
    ```bash
    python manage.py migrate
    ```
 
-6. Create a superuser:
+2. Create a superuser:
    ```bash
    python manage.py createsuperuser
    ```
 
-7. Run the development server:
+3. Run the development server:
    ```bash
    python manage.py runserver
    ```
+   
+If you chose docker settings file:
+1. Build and start the Docker containers:
+   ```bash
+   docker-compose build
+   docker-compose up -d
+   ```
+
+2. Apply migrations:
+   ```bash
+   docker-compose exec web python manage.py migrate
+   ```
+
+3. Create a superuser:
+   ```bash
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+4. Access the API at http://localhost:8000/api/
+
+## Environment Variables (.env file)
+
+Make the following changes to your .env file:
+
+```
+# Database settings
+POSTGRES_PASSWORD=your_database_password
+POSTGRES_USER=your_database_user
+POSTGRES_DB=theater_db
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+PGDATA=/var/lib/postgresql/data
+
+# Django settings
+DJANGO_SECRET_KEY=your_secure_secret_key
+DJANGO_SETTINGS_MODULE=path_to_settings_file # Use theatre_service.settings.docker for Docker, theatre_service.settings.local for local development
+```
 
 ## API Documentation
 
