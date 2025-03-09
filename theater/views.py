@@ -302,14 +302,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
-        print(f"self.action: {self.action}")
         if self.action == "list":
             serializer = ReservationListSerializer
         elif self.action == "retrieve":
             serializer = ReservationDetailsSerializer
         else:
             serializer = ReservationSerializer
-        print(f"get_serializer_class() returns: {type(serializer)}")
         return serializer
 
     @reservation_list_docs
