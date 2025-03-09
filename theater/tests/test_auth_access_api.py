@@ -2,9 +2,16 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from theater.models import Performance
+from theater.models import Play, Performance
 from theater.serializers import PlayListSerializer, PerformanceListSerializer
-from theater.tests.elements_for_tests import *
+from theater.tests.elements_for_tests import (
+    GENRES_URL,
+    ACTORS_URL,
+    PLAYS_URL,
+    THEATRE_HALL_URL,
+    RESERVATIONS_URL,
+    PERFORMANCE_URL
+)
 
 
 class UnauthenticatedUserApiTests(TestCase):
