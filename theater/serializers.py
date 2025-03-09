@@ -69,8 +69,8 @@ class PerformanceSerializer(serializers.ModelSerializer):
 
 
 class TicketsFeatureListSerializer(PerformanceSerializer):
-    play = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
-    theatre_hall = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    play = serializers.SlugRelatedField(read_only=True, slug_field="title")
+    theatre_hall = serializers.SlugRelatedField(read_only=True, slug_field="name")
     taken_seats = serializers.IntegerField(read_only=True)
     tickets_available = serializers.SerializerMethodField()
 
@@ -83,8 +83,8 @@ class TicketsFeatureListSerializer(PerformanceSerializer):
 
 
 class TicketsFeatureDetailsSerializer(PerformanceSerializer):
-    play = PlayDetailsSerializer(many=False, read_only=True)
-    theatre_hall = TheatreHallSerializer(many=False, read_only=True)
+    play = PlayDetailsSerializer(read_only=True)
+    theatre_hall = TheatreHallSerializer(read_only=True)
     taken_seats = serializers.IntegerField(read_only=True)
     tickets_available = serializers.SerializerMethodField()
 
@@ -97,8 +97,8 @@ class TicketsFeatureDetailsSerializer(PerformanceSerializer):
 
 
 class PerformanceListSerializer(PerformanceSerializer):
-    play = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
-    theatre_hall = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    play = serializers.SlugRelatedField(read_only=True, slug_field="title")
+    theatre_hall = serializers.SlugRelatedField(read_only=True, slug_field="name")
 
     class Meta:
         model = Performance
@@ -106,8 +106,8 @@ class PerformanceListSerializer(PerformanceSerializer):
 
 
 class PerformanceDetailsSerializer(PerformanceSerializer):
-    play = PlayDetailsSerializer(many=False, read_only=True)
-    theatre_hall = TheatreHallSerializer(many=False, read_only=True)
+    play = PlayDetailsSerializer(read_only=True)
+    theatre_hall = TheatreHallSerializer(read_only=True)
 
     class Meta:
         model = Performance
@@ -115,7 +115,7 @@ class PerformanceDetailsSerializer(PerformanceSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    performance = serializers.PrimaryKeyRelatedField(many=False, queryset=Performance.objects.all())
+    performance = serializers.PrimaryKeyRelatedField(queryset=Performance.objects.all())
 
     class Meta:
         model = Ticket
@@ -133,15 +133,15 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketDetailsSerializer(TicketSerializer):
-    performance = PerformanceDetailsSerializer(many=False, read_only=True)
+    performance = PerformanceDetailsSerializer(read_only=True)
 
 
 class TicketListSerializer(TicketSerializer):
-    performance = PerformanceListSerializer(many=False, read_only=True)
+    performance = PerformanceListSerializer(read_only=True)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+    tickets = TicketSerializer(many=True, allow_empty=False)
 
     class Meta:
         model = Reservation
