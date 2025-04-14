@@ -17,19 +17,6 @@ class ReservationViewSetTests(TestCase):
         self.reservation = create_reservation(self.user)
         self.ticket = create_ticket(self.reservation, self.performance)
 
-    # def tearDown(self):
-    #     # Delete tickets first due to foreign key constraints
-    #     Ticket.objects.all().delete()
-    #     # Delete reservations
-    #     Reservation.objects.all().delete()
-    #     # Delete performances
-    #     Performance.objects.all().delete()
-    #     # Delete theatre halls and plays
-    #     TheatreHall.objects.all().delete()
-    #     Play.objects.all().delete()
-    #     # Delete users
-    #     get_user_model().objects.filter(email="test@test.com").delete()
-
     def test_list_reservations(self):
         response = self.client.get(RESERVATIONS_URL)
         reservations = Reservation.objects.filter(user=self.user)
